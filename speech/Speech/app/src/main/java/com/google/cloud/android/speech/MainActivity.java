@@ -186,6 +186,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mAdapter = new ResultAdapter(flags);
                 mRecyclerView.setAdapter(mAdapter);
 
+                Intent i = new Intent(context, PostRecordActivity.class);
+                i.putExtra("transcript", finalTranscript);
+                i.putExtra("flags", flags);
+                context.startActivity(i);
+
             }
         });
 
@@ -197,11 +202,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
             }
         });
-
-    }
-
-    private void addFlag() {
-
 
     }
 
