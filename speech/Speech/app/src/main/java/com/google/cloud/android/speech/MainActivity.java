@@ -18,6 +18,7 @@ package com.google.cloud.android.speech;
 
 import android.Manifest;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
@@ -28,6 +29,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -37,6 +39,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -87,8 +91,19 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     // View references
     private TextView mStatus;
     private TextView mText;
+    private ImageView ivPlay;
+    private ImageButton ibStop;
+    private CardView cvTranscript;
+    private TextView tvTranscript;
+    private ImageButton ibFlag;
+
+
     private ResultAdapter mAdapter;
     private RecyclerView mRecyclerView;
+
+    private ArrayList<String> transcriptSnippets;
+    private ArrayList<String> flags;
+    private Context context;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -111,6 +126,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // initialize transcript
+        transcriptSnippets = new ArrayList<>();
+        flags = new ArrayList<>();
+        context = this;
+
         final Resources resources = getResources();
         final Resources.Theme theme = getTheme();
         mColorHearing = ResourcesCompat.getColor(resources, R.color.status_hearing, theme);
@@ -119,13 +139,70 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         mStatus = (TextView) findViewById(R.id.status);
         mText = (TextView) findViewById(R.id.text);
+        ivPlay = (ImageView) findViewById(R.id.ivRecord);
+        ibStop = (ImageButton) findViewById(R.id.ibStop);
+        tvTranscript = (TextView) findViewById(R.id.tvTranscript);
+        cvTranscript = (CardView) findViewById(R.id.cvTranscript);
+        ibFlag = (ImageButton) findViewById(R.id.ibFlag);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        // setup recycler view
+        mRecyclerView = (RecyclerView) findViewById(R.id.rvFlags);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        final ArrayList<String> results = savedInstanceState == null ? null :
-                savedInstanceState.getStringArrayList(STATE_RESULTS);
-        mAdapter = new ResultAdapter(results);
-        mRecyclerView.setAdapter(mAdapter);
+
+        ivPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start listening to voices
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    startVoiceRecorder();
+                } else if (ActivityCompat.shouldShowRequestPermissionRationale((MainActivity) context,
+                        Manifest.permission.RECORD_AUDIO)) {
+                    showPermissionMessageDialog();
+                } else {
+                    ActivityCompat.requestPermissions((MainActivity) context, new String[]{Manifest.permission.RECORD_AUDIO},
+                            REQUEST_RECORD_AUDIO_PERMISSION);
+                }
+            }
+        });
+
+        ibStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Stop listening to voice
+                stopVoiceRecorder();
+
+                String finalTranscript = "";
+
+                for (String snippet : transcriptSnippets) {
+                    finalTranscript += snippet + ' ';
+                }
+
+                ivPlay.setVisibility(View.GONE);
+                ibStop.setVisibility(View.GONE);
+                cvTranscript.setVisibility(View.VISIBLE);
+                tvTranscript.setText(finalTranscript);
+
+                mAdapter = new ResultAdapter(flags);
+                mRecyclerView.setAdapter(mAdapter);
+
+            }
+        });
+
+        ibFlag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // add the last two snippets
+                flags.add(transcriptSnippets.get(transcriptSnippets.size() - 1));
+
+            }
+        });
+
+    }
+
+    private void addFlag() {
+
+
     }
 
     @Override
@@ -134,44 +211,26 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         // Prepare Cloud Speech API
         bindService(new Intent(this, SpeechService.class), mServiceConnection, BIND_AUTO_CREATE);
-
-        // Start listening to voices
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                == PackageManager.PERMISSION_GRANTED) {
-            startVoiceRecorder();
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.RECORD_AUDIO)) {
-            showPermissionMessageDialog();
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
-                    REQUEST_RECORD_AUDIO_PERMISSION);
-        }
     }
 
     @Override
     protected void onStop() {
-        // Stop listening to voice
-        stopVoiceRecorder();
-
         // Stop Cloud Speech API
         mSpeechService.removeListener(mSpeechServiceListener);
         unbindService(mServiceConnection);
         mSpeechService = null;
-
         super.onStop();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mAdapter != null) {
-            outState.putStringArrayList(STATE_RESULTS, mAdapter.getResults());
-        }
+
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults) {
         if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
             if (permissions.length == 1 && grantResults.length == 1
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -250,8 +309,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                             public void run() {
                                 if (isFinal) {
                                     mText.setText(null);
-                                    mAdapter.addResult(text);
-                                    mRecyclerView.smoothScrollToPosition(0);
+                                    transcriptSnippets.add(text);
                                 } else {
                                     mText.setText(text);
                                 }
@@ -297,15 +355,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             return mResults.size();
         }
 
-        void addResult(String result) {
-            mResults.add(0, result);
-            notifyItemInserted(0);
-        }
-
         public ArrayList<String> getResults() {
             return mResults;
         }
 
-    }
 
+    }
 }
