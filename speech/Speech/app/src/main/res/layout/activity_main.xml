@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<android.support.design.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -41,14 +41,52 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <android.support.v7.widget.CardView
+        android:id="@+id/cvTranscript"
+        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/spacing_small"
-        android:paddingTop="@dimen/spacing_small"
-        app:behavior_overlapTop="128dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        android:layout_below="@+id/app_bar"
+        android:layout_margin="@dimen/spacing_medium"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tvTranscript"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </android.support.v7.widget.CardView>
 
-</android.support.design.widget.CoordinatorLayout>
+    <ImageView
+        android:id="@+id/ivRecord"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_centerInParent="true"
+        app:srcCompat="@android:drawable/ic_btn_speak_now" />
+
+    <ImageButton
+        android:id="@+id/ibStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivRecord"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        app:srcCompat="@android:drawable/ic_media_pause" />
+
+    <ImageButton
+        android:id="@+id/ibFlag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/ibStop"
+        android:layout_below="@+id/ibStop"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="33dp"
+        app:srcCompat="@android:drawable/btn_star" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvFlags"
+        android:layout_below="@id/cvTranscript"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+
+</RelativeLayout>
