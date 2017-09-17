@@ -1,5 +1,6 @@
 package com.google.cloud.android.speech;
 
+import android.support.v4.app.Fragment;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
