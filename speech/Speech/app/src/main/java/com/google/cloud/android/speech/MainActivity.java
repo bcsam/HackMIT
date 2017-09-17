@@ -26,11 +26,14 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -39,9 +42,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.cloud.android.speech.Fragments.MainControlFragment;
+import com.google.cloud.android.speech.Fragments.MainQAFragment;
 
 import java.util.ArrayList;
 
@@ -91,18 +95,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     // View references
     private TextView mStatus;
     private TextView mText;
-    private ImageView ivPlay;
-    private ImageButton ibStop;
-    private CardView cvTranscript;
-    private TextView tvTranscript;
-    private ImageButton ibFlag;
+    FragmentPagerAdapter adapterViewPager;
+    ViewPager vpPager;
 
 
-    private ResultAdapter mAdapter;
-    private RecyclerView mRecyclerView;
-
-    private ArrayList<String> transcriptSnippets;
-    private ArrayList<String> flags;
     private Context context;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -127,8 +123,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         setContentView(R.layout.activity_main);
 
         // initialize transcript
-        transcriptSnippets = new ArrayList<>();
-        flags = new ArrayList<>();
         context = this;
 
         final Resources resources = getResources();
@@ -139,69 +133,15 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         mStatus = (TextView) findViewById(R.id.status);
         mText = (TextView) findViewById(R.id.text);
-        ivPlay = (ImageView) findViewById(R.id.ivRecord);
-        ibStop = (ImageButton) findViewById(R.id.ibStop);
-        tvTranscript = (TextView) findViewById(R.id.tvTranscript);
-        cvTranscript = (CardView) findViewById(R.id.cvTranscript);
-        ibFlag = (ImageButton) findViewById(R.id.ibFlag);
 
-        // setup recycler view
-        mRecyclerView = (RecyclerView) findViewById(R.id.rvFlags);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // setup viewpager
+        vpPager = (ViewPager) findViewById(R.id.vpPager);
+        adapterViewPager = new MainPagerAdapter(getSupportFragmentManager());
+        vpPager.setAdapter(adapterViewPager);
 
-        ivPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Start listening to voices
-                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    startVoiceRecorder();
-                } else if (ActivityCompat.shouldShowRequestPermissionRationale((MainActivity) context,
-                        Manifest.permission.RECORD_AUDIO)) {
-                    showPermissionMessageDialog();
-                } else {
-                    ActivityCompat.requestPermissions((MainActivity) context, new String[]{Manifest.permission.RECORD_AUDIO},
-                            REQUEST_RECORD_AUDIO_PERMISSION);
-                }
-            }
-        });
-
-        ibStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Stop listening to voice
-                stopVoiceRecorder();
-
-                String finalTranscript = "";
-
-                for (String snippet : transcriptSnippets) {
-                    finalTranscript += snippet + ' ';
-                }
-
-                ivPlay.setVisibility(View.GONE);
-                ibStop.setVisibility(View.GONE);
-                cvTranscript.setVisibility(View.VISIBLE);
-                tvTranscript.setText(finalTranscript);
-
-                mAdapter = new ResultAdapter(flags);
-                mRecyclerView.setAdapter(mAdapter);
-
-                Intent i = new Intent(context, PostRecordActivity.class);
-                i.putExtra("transcript", finalTranscript);
-                i.putExtra("flags", flags);
-                context.startActivity(i);
-
-            }
-        });
-
-        ibFlag.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // add the last two snippets
-                flags.add(transcriptSnippets.get(transcriptSnippets.size() - 1));
-
-            }
-        });
+        // give viewpager to tablayout
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(vpPager);
 
     }
 
@@ -260,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         }
     }
 
-    private void startVoiceRecorder() {
+    public void startVoiceRecorder() {
         if (mVoiceRecorder != null) {
             mVoiceRecorder.stop();
         }
@@ -268,14 +208,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         mVoiceRecorder.start();
     }
 
-    private void stopVoiceRecorder() {
+    public void stopVoiceRecorder() {
         if (mVoiceRecorder != null) {
             mVoiceRecorder.stop();
             mVoiceRecorder = null;
         }
     }
 
-    private void showPermissionMessageDialog() {
+    public void showPermissionMessageDialog() {
         MessageDialogFragment
                 .newInstance(getString(R.string.permission_message))
                 .show(getSupportFragmentManager(), FRAGMENT_MESSAGE_DIALOG);
@@ -309,7 +249,12 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                             public void run() {
                                 if (isFinal) {
                                     mText.setText(null);
-                                    transcriptSnippets.add(text);
+
+                                    // add to control fragment's snippet
+                                    MainControlFragment controlFragment = (MainControlFragment) getSupportFragmentManager()
+                                            .findFragmentByTag("android:switcher:" + R.id.vpPager + ":" + vpPager.getCurrentItem());
+
+                                    controlFragment.addSnipet(text);
                                 } else {
                                     mText.setText(text);
                                 }
@@ -359,6 +304,40 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             return mResults;
         }
 
+
+    }
+
+    public static class MainPagerAdapter extends FragmentPagerAdapter {
+        private static int NUM_ITEMS = 2;
+        private String tabTitles[] = new String[] {"Home", "QA"};
+        public MainPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+
+        // Returns total number of pages
+        @Override
+        public int getCount() {
+            return NUM_ITEMS;
+        }
+
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0: // Fragment # 0 - This will show FirstFragment
+                    return new MainControlFragment();
+                case 1: // Fragment # 0 - This will show FirstFragment different title
+                    return new MainQAFragment();
+                default:
+                    return null;
+            }
+        }
+
+        // Returns the page title for the top indicator
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tabTitles[position];
+        }
 
     }
 }

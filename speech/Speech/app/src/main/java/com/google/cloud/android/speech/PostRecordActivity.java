@@ -17,10 +17,10 @@ public class PostRecordActivity extends AppCompatActivity {
         transcript = getIntent().getStringExtra("transcript");
 
         //AnalyzerClient client = new AnalyzerClient();
-        client.getScores(transcript);
+        //client.getScores(transcript);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter()
+        //ViewPagerAdapter adapter = new ViewPagerAdapter()
     }
 }
