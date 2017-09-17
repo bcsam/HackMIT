@@ -22,7 +22,6 @@ public class PostRecordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.post_record);
         transcript = getIntent().getStringExtra("transcript");
-
         //AnalyzerClient client = new AnalyzerClient();
         //client.getScores(transcript);
 
