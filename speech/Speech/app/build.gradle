@@ -111,6 +111,11 @@ dependencies {
     compile 'javax.annotation:javax.annotation-api:1.2'
     protobuf 'com.google.protobuf:protobuf-java:3.3.1'
 
+    //asyncHttp
+    compile 'com.loopj.android:android-async-http:1.4.9'
+
+    compile 'com.ibm.watson.developer_cloud:java-sdk:3.7.2'
+
     // OAuth2 for Google API
     compile('com.google.auth:google-auth-library-oauth2-http:0.7.0') {
         exclude module: 'httpclient'
