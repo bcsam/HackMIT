@@ -15,6 +15,7 @@ import android.widget.TextView;
 public class TranscriptFragment extends Fragment{
     TextView tvTranscript;
 
+
     public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
     }
