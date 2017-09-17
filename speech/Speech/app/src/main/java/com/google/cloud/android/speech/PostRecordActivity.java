@@ -1,6 +1,7 @@
 package com.google.cloud.android.speech;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -21,14 +22,19 @@ public class PostRecordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.post_record);
         transcript = getIntent().getStringExtra("transcript");
-
         //AnalyzerClient client = new AnalyzerClient();
-        client.getScores(transcript);
+        //client.getScores(transcript);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter();
-        adapter.addFrag(new ());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFrag(new KeywordFragment(), "Keywords", "postRecord");
+        adapter.addFrag(new ConceptFragment(), "Concepts", "postRecord");
+        adapter.addFrag(new EntitiesFragment(), "Entities", "postRecord");
+
+        viewPager.setAdapter(adapter);
+        TabLayout mTabLayout = (TabLayout) findViewById(R.id.pager_header);
+        mTabLayout.setupWithViewPager(viewPager);
     }
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter{
@@ -49,11 +55,16 @@ public class PostRecordActivity extends AppCompatActivity {
             return mFragmentList.size();
         }
 
-        public void addFrag(Fragment fragment, String title){
+        public void addFrag(Fragment fragment, String title, String activity){
 //            Bundle bundle = new Bundle();
 //            fragment.setArguments(bundle);
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
         }
 
     }
