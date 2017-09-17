@@ -28,6 +28,8 @@ public class RestfulClient {
     private final String API_KEY = "";
     private final String API_BASE_URL = "https://gateway.watsonplatform.net/natural-language-understanding/api/v1";
     private AsyncHttpClient client;
+    private String USERNAME = "645552ab-28fd-4b44-9868-0854b00a3495";
+    private String PASSWORD = "XTcJf0YpdSFv";
 
     public RestfulClient() {
         this.client = new AsyncHttpClient();
@@ -39,8 +41,8 @@ public class RestfulClient {
 
         NaturalLanguageUnderstanding service = new NaturalLanguageUnderstanding(
                 NaturalLanguageUnderstanding.VERSION_DATE_2017_02_27,
-                "{username}",
-                "{password}"
+                USERNAME,
+                PASSWORD
         );
 
         EntitiesOptions entitiesOptions = new EntitiesOptions.Builder()
