@@ -37,7 +37,6 @@
         android:layout_height="80dp"
         android:layout_below="@+id/textView3"
         android:layout_centerHorizontal="true"
-
-        app:srcCompat="@drawable/darkroundcorner" />
+        app:srcCompat="@drawable/darkroundcorner"/>
 
 </RelativeLayout>
