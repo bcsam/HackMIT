@@ -2,6 +2,7 @@ package com.google.cloud.android.speech.Fragments;
 
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.google.cloud.android.speech.MainActivity;
+import com.google.cloud.android.speech.PostRecordActivity;
 import com.google.cloud.android.speech.R;
 import com.skyfishjy.library.RippleBackground;
 
@@ -74,6 +76,12 @@ public class MainControlFragment extends Fragment {
                         finalTranscript += snippet + ' ';
                     }
                     rippleBackground.stopRippleAnimation();
+
+                    Intent i = new Intent(getActivity(), PostRecordActivity.class);
+                    i.putExtra("transcript", finalTranscript);
+                    i.putExtra("flags", flags);
+                    startActivity(i);
+
 
                     //ivPlay.setVisibility(View.GONE);
 

@@ -28,7 +28,7 @@ public class PostRecordActivity extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-
+        adapter.addFrag(new TranscriptFragment(), "Transcript", "postRecord");
         adapter.addFrag(new KeywordFragment(), "Keywords", "postRecord");
         adapter.addFrag(new ConceptFragment(), "Concepts", "postRecord");
         adapter.addFrag(new EntitiesFragment(), "Entities", "postRecord");
@@ -57,8 +57,9 @@ public class PostRecordActivity extends AppCompatActivity {
         }
 
         public void addFrag(Fragment fragment, String title, String activity){
-//            Bundle bundle = new Bundle();
-//            fragment.setArguments(bundle);
+            Bundle bundle = new Bundle();
+            bundle.putString("transcript", transcript);
+            fragment.setArguments(bundle);
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }
