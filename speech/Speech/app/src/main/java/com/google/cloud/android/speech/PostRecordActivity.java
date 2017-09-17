@@ -28,6 +28,7 @@ public class PostRecordActivity extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
 
         ViewPagerAdapter adapter = new ViewPagerAdapter();
+        adapter.addFrag(new ());
     }
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter{
@@ -47,5 +48,13 @@ public class PostRecordActivity extends AppCompatActivity {
         public int getCount() {
             return mFragmentList.size();
         }
+
+        public void addFrag(Fragment fragment, String title){
+//            Bundle bundle = new Bundle();
+//            fragment.setArguments(bundle);
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
     }
 }
