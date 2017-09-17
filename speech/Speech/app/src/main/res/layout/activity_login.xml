@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.google.cloud.android.speech.Activities.LoginActivity"
+    android:background="@drawable/gradient">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Ekko"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:textColor="@color/white"
+        android:textSize="70sp"
+        android:id="@+id/textView3" />
+
+    <Button
+        android:id="@+id/btGo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="120dp"
+        android:background="@drawable/darkroundcorner"
+        android:fontFamily="sans-serif-smallcaps"
+        android:onClick="launchIntent"
+        android:text="Register"
+        android:textColor="@color/white" />
+
+    <ImageView
+        android:id="@+id/ivProfilePicture"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+
+        app:srcCompat="@drawable/darkroundcorner" />
+
+</RelativeLayout>

@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 
 import com.google.cloud.android.speech.MainActivity;
 import com.google.cloud.android.speech.R;
+import com.skyfishjy.library.RippleBackground;
 
 import java.util.ArrayList;
 
@@ -24,6 +25,9 @@ public class MainControlFragment extends Fragment {
     private ImageButton ivPlay;
     private ImageButton ibStop;
     private ImageButton ibFlag;
+    private RippleBackground rippleBackground;
+
+    private boolean isListening;
 
     private ArrayList<String> transcriptSnippets;
     private ArrayList<String> flags;
@@ -43,8 +47,8 @@ public class MainControlFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_control, container, false);
 
         ivPlay = (ImageButton) v.findViewById(R.id.ivRecord);
-        ibStop = (ImageButton) v.findViewById(R.id.ibStop);
         ibFlag = (ImageButton) v.findViewById(R.id.ibFlag);
+        rippleBackground = (RippleBackground) v.findViewById(R.id.content);
 
         transcriptSnippets = new ArrayList<>();
         flags = new ArrayList<>();
@@ -58,21 +62,43 @@ public class MainControlFragment extends Fragment {
         ivPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Start listening to voices
-                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    ((MainActivity)getActivity()).startVoiceRecorder();
-                } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                        Manifest.permission.RECORD_AUDIO)) {
-                    ((MainActivity)getActivity()).showPermissionMessageDialog();
+
+                if (isListening) {
+                    isListening = false;
+                    // Stop listening to voice
+                    ((MainActivity) getActivity()).stopVoiceRecorder();
+
+                    String finalTranscript = "";
+
+                    for (String snippet : transcriptSnippets) {
+                        finalTranscript += snippet + ' ';
+                    }
+                    rippleBackground.stopRippleAnimation();
+
+                    //ivPlay.setVisibility(View.GONE);
+
                 } else {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO},
-                            REQUEST_RECORD_AUDIO_PERMISSION);
+                    // Start listening to voices
+                    isListening = true;
+                    rippleBackground.startRippleAnimation();
+                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO)
+                            == PackageManager.PERMISSION_GRANTED) {
+
+                        ((MainActivity)getActivity()).startVoiceRecorder();
+
+                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                            Manifest.permission.RECORD_AUDIO)) {
+                        ((MainActivity)getActivity()).showPermissionMessageDialog();
+                    } else {
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO},
+                                REQUEST_RECORD_AUDIO_PERMISSION);
+                    }
                 }
+
             }
         });
 
-        ibStop.setOnClickListener(new View.OnClickListener() {
+        /*ibStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Stop listening to voice
@@ -83,9 +109,10 @@ public class MainControlFragment extends Fragment {
                 for (String snippet : transcriptSnippets) {
                     finalTranscript += snippet + ' ';
                 }
+                rippleBackground.stopRippleAnimation();
 
                 ivPlay.setVisibility(View.GONE);
-                ibStop.setVisibility(View.GONE);
+                ibStop.setVisibility(View.GONE);*/
 
                 /*
                 cvTranscript.setVisibility(View.VISIBLE);
@@ -97,10 +124,10 @@ public class MainControlFragment extends Fragment {
                 Intent i = new Intent(context, PostRecordActivity.class);
                 i.putExtra("transcript", finalTranscript);
                 i.putExtra("flags", flags);
-                context.startActivity(i); */
+                context.startActivity(i);
 
             }
-        });
+        });*/
 
         ibFlag.setOnClickListener(new View.OnClickListener() {
             @Override

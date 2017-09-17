@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     private SpeechService mSpeechService;
 
     private VoiceRecorder mVoiceRecorder;
+
     private final VoiceRecorder.Callback mVoiceCallback = new VoiceRecorder.Callback() {
 
         @Override
@@ -97,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     private TextView mText;
     FragmentPagerAdapter adapterViewPager;
     ViewPager vpPager;
-
 
     private Context context;
 
