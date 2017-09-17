@@ -24,6 +24,7 @@
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
+        android:elevation="2dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
@@ -41,6 +42,21 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <android.support.design.widget.TabLayout
+        android:id="@+id/sliding_tabs"
+        android:layout_below="@id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabMode="fixed" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vpPager"
+        android:layout_below="@id/sliding_tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </android.support.v4.view.ViewPager>
+    <!--
     <android.support.v7.widget.CardView
         android:id="@+id/cvTranscript"
         android:visibility="gone"
@@ -86,6 +102,7 @@
         android:layout_below="@id/cvTranscript"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+        -->
 
 
 
