@@ -28,6 +28,7 @@ public class PostRecordActivity extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
         adapter.addFrag(new KeywordFragment(), "Keywords", "postRecord");
         adapter.addFrag(new ConceptFragment(), "Concepts", "postRecord");
         adapter.addFrag(new EntitiesFragment(), "Entities", "postRecord");
