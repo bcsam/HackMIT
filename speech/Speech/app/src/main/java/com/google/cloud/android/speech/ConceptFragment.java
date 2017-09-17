@@ -12,7 +12,7 @@ public class ConceptFragment extends Fragment{
 
     //Analyzer client;
 
-    protected void onCreate(@Nullable Bundle savedInstanceState){
+    public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         //client =
         populateTimeline();
